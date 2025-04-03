@@ -1,0 +1,12 @@
+{
+  "C_Cpp.intelliSenseEngine": "default",
+  "idf.espIdfPath": "/Users/liy/esp/esp-idf",
+  "idf.pythonInstallPath": "/opt/homebrew/bin/python3",
+  "idf.openOcdConfigs": ["board/esp32c6-builtin.cfg"],
+  "idf.port": "/dev/tty.usbserial-10",
+  "idf.toolsPath": "/Users/liy/.espressif",
+  "idf.customExtraVars": {
+    "IDF_TARGET": "esp32c6"
+  },
+  "idf.flashType": "UART"
+}
