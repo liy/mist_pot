@@ -12,40 +12,35 @@
 #include "esp_chip_info.h"
 #include "esp_flash.h"
 #include "esp_system.h"
-#include "driver/ledc.h"
+#include "driver/gpio.h"
 
-void configure_pwm(void)
+void configure_gpio(void)
 {
-    // Configure the LEDC timer
-    ledc_timer_config_t ledc_timer = {
-        .speed_mode       = LEDC_LOW_SPEED_MODE,
-        .timer_num        = LEDC_TIMER_0,
-        .duty_resolution  = LEDC_TIMER_13_BIT,
-        .freq_hz          = 5,
-        .clk_cfg          = LEDC_AUTO_CLK
+    // Configure GPIO pin as output
+    gpio_config_t io_conf = {
+        .pin_bit_mask = (1ULL << 18),  // GPIO pin 18
+        .mode = GPIO_MODE_OUTPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_ENABLE,
+        .intr_type = GPIO_INTR_DISABLE
     };
-    ledc_timer_config(&ledc_timer);
+    gpio_config(&io_conf);
 
-    // Configure the LEDC channel
-    ledc_channel_config_t ledc_channel = {
-        .gpio_num       = 18,  // GPIO pin to output PWM signal
-        .speed_mode     = LEDC_LOW_SPEED_MODE,
-        .channel        = LEDC_CHANNEL_0,
-        .timer_sel      = LEDC_TIMER_0,
-        // duty = (1 << duty_resolution) / (100 / duty_percentage)
-        .duty           = (1 << 13) / (100 / 50),  
-        .hpoint         = 0
-    };
-    ledc_channel_config(&ledc_channel);
-
-    // Optionally, fade functionality can be added here
+    // Set initial state to OFF
+    gpio_set_level(18, 0);
 }
 
 void app_main(void)
 {
-    configure_pwm();
+    configure_gpio();
 
     while (1) {
-        vTaskDelay(portMAX_DELAY);  // Keep the MCU running indefinitely
+        // Toggle GPIO pin to control MOSFET
+        printf("Turning MOSFET ON\n");
+        gpio_set_level(18, 1);  // Turn MOSFET ON
+        vTaskDelay(pdMS_TO_TICKS(5000));  // Delay 1 second
+        printf("Turning MOSFET OFF\n");
+        gpio_set_level(18, 0);  // Turn MOSFET OFF
+        vTaskDelay(pdMS_TO_TICKS(5000));  // Delay 1 second
     }
 }
